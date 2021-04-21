@@ -93,6 +93,26 @@ export class AuthService {
     }
     return throwError(ErrorMessage);
   }
+  autoLogin() {
+    const userData: {
+      email: string;
+      id: string;
+      _token: string;
+      _tokenExpirationDate: string;
+    } = JSON.parse(localStorage.getItem("userData"));
+    if (!userData) {
+      return;
+    }
+    const loadUser = new User(
+      userData.email,
+      userData.id,
+      userData._token,
+      new Date(userData._tokenExpirationDate)
+    );
+    if(loadUser.token){
+      this.user.next(loadUser)
+    }
+  }
 
   private HandleAuthUser(
     email: string,
@@ -104,5 +124,6 @@ export class AuthService {
     const user = new User(email, userID, token, tokenExpiry);
     console.log(user);
     this.user.next(user);
+    localStorage.setItem("userData", JSON.stringify(user));
   }
 }
